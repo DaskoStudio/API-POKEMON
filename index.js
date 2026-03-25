@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 let pokemons = require('./db-pokemons');
 let helper = require('./helper');
 
@@ -7,6 +8,9 @@ const PORT = process.env.PORT || 3003;
 
 // Middleware pour parser les requêtes JSON
 app.use(express.json());
+
+// Middleware pour autoriser les requêtes CORS (Cross-Origin Resource Sharing)
+app.use(cors());
 
 // Route pour l'accueil
 app.get('/', (req, res) => {
