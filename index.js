@@ -24,8 +24,13 @@ app.get('/api/pokemons', (req, res) => {
 app.get('/api/pokemons/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const pokemon = pokemons.find( pokemon=> pokemon.id === id );
-    const message = "One pokemon is founded !";
-    res.json( helper.success(message, pokemon) );
+    if (pokemon) {
+        const message = "Un Pokémon a été trouvé.";
+        res.json( helper.success(message, pokemon) );
+    } else {
+        const message = "Aucun Pokémon n'a été trouvé avec cet identifiant.";
+        res.status(404).json({ message });
+    }
 });
 
 // Route pour ajouter un nouveau pokemon
