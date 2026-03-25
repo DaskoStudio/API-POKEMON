@@ -120,4 +120,4 @@ Supprime un Pokémon spécifique en fonction de son `id`.
 
 ## Outils
 
-Pour tester les endpoints, vous pouvez utiliser des outils comme Postman ou l'extension Thunder Client pour VS Code.
+**Postman** a été utilisé tout au long du développement pour tester les différentes routes (GET, POST, PUT, DELETE) de l'API. Vous pouvez utiliser ce même outil (ou l'extension Thunder Client pour VS Code) pour interagir avec l'API en local ou en production.
