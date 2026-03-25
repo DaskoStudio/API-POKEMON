@@ -75,3 +75,6 @@ app.delete('/api/pokemons/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server listening on http://localhost:${PORT}`);
 });
+
+// Ligne indispensable pour que Vercel puisse utiliser cette application Express
+module.exports = app;
