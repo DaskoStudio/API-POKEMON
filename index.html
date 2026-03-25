@@ -52,59 +52,6 @@
             box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
         }
 
-        /* --- CONTRÔLES (Tri & Vue) --- */
-        .controls-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 600px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        #sortSelect, #viewToggle {
-            padding: 10px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            cursor: pointer;
-            background-color: white;
-            transition: border-color 0.3s;
-        }
-
-        #sortSelect:focus, #viewToggle:hover {
-            border-color: var(--primary);
-        }
-
-        /* --- VUE LISTE CSS --- */
-        .list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .list .card {
-            display: flex;
-            align-items: center;
-            text-align: left;
-            padding: 15px 25px;
-            gap: 20px;
-        }
-
-        .list .card img {
-            width: 70px;
-            height: 70px;
-            margin-bottom: 0;
-        }
-
-        .list .card h2 { margin: 0; width: 150px; }
-        .list .card .hp { margin: 0; width: 100px; }
-        .list .card .types { margin: 0; margin-left: auto; justify-content: flex-end; }
-
         #errorContainer {
             background-color: #ffdddd;
             color: #d8000c;
@@ -241,18 +188,6 @@
         <input type="text" id="searchInput" placeholder="Rechercher un Pokémon par nom...">
     </div>
 
-    <!-- Nouveaux contrôles pour le tri et l'affichage -->
-    <div class="controls-container">
-        <select id="sortSelect">
-            <option value="id-asc">Tri par défaut (ID)</option>
-            <option value="name-asc">Nom (A - Z)</option>
-            <option value="name-desc">Nom (Z - A)</option>
-            <option value="hp-desc">Points de vie (Max - Min)</option>
-            <option value="hp-asc">Points de vie (Min - Max)</option>
-        </select>
-        <button id="viewToggle">Vue Liste 📜</button>
-    </div>
-
     <div id="errorContainer"></div>
 
     <div class="grid" id="pokemonContainer">
@@ -284,9 +219,6 @@
         const container = document.getElementById('pokemonContainer');
         const searchInput = document.getElementById('searchInput');
         const errorContainer = document.getElementById('errorContainer');
-        const sortSelect = document.getElementById('sortSelect');
-        const viewToggle = document.getElementById('viewToggle');
-        let isListView = false; // Mémorise l'état de l'affichage
 
         const modal = document.getElementById('pokemonModal');
         const modalBody = document.getElementById('modalBody');
@@ -305,7 +237,7 @@
                 
                 // Dans votre API (grâce à helper.success), le tableau de pokémons est dans "data"
                 allPokemons = json.data; 
-                updateDisplay(); // Utilisation de la nouvelle fonction qui gère le tri par défaut
+                displayPokemons(allPokemons);
 
             } catch (error) {
                 console.error("Erreur lors de la récupération :", error);
@@ -395,43 +327,17 @@
             }
         });
 
-        // Nouvelle fonction globale pour filtrer et trier en même temps
-        function updateDisplay() {
+        // Barre de recherche (filtrage dynamique)
+        searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
-            const sortValue = sortSelect.value;
             
-            // 1. On filtre par nom
-            let result = allPokemons.filter(pokemon => 
+            // On filtre le tableau complet sauvegardé en mémoire
+            const filteredPokemons = allPokemons.filter(pokemon => 
                 pokemon.name.toLowerCase().includes(searchTerm)
             );
             
-            // 2. On trie le résultat filtré
-            result.sort((a, b) => {
-                if (sortValue === 'name-asc') return a.name.localeCompare(b.name);
-                if (sortValue === 'name-desc') return b.name.localeCompare(a.name);
-                if (sortValue === 'hp-desc') return b.hp - a.hp;
-                if (sortValue === 'hp-asc') return a.hp - b.hp;
-                return a.id - b.id; // id-asc par défaut
-            });
-            
-            // 3. On met à jour l'affichage avec le tableau final
-            displayPokemons(result);
-        }
-
-        // Écouteurs d'événements : on relance la mise à jour si on tape du texte ou si on change le tri
-        searchInput.addEventListener('input', updateDisplay);
-        sortSelect.addEventListener('change', updateDisplay);
-
-        // Changement de vue (Grille / Liste)
-        viewToggle.addEventListener('click', () => {
-            isListView = !isListView;
-            if (isListView) {
-                container.classList.replace('grid', 'list');
-                viewToggle.textContent = 'Vue Grille 🔲';
-            } else {
-                container.classList.replace('list', 'grid');
-                viewToggle.textContent = 'Vue Liste 📜';
-            }
+            // On met à jour l'affichage
+            displayPokemons(filteredPokemons);
         });
 
         // Fermeture de la modale
