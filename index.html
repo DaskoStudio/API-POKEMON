@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex API</title>
+    <style>
+        :root {
+            --bg-color: #f4f5f7;
+            --text-color: #333;
+            --card-bg: #fff;
+            --primary: #4caf50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #2c3e50;
+        }
+
+        .search-container {
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+
+        #errorContainer {
+            background-color: #ffdddd;
+            color: #d8000c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            border-left: 5px solid #d8000c;
+        }
+
+        /* --- GRILLE CSS --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* --- STYLE DES CARTES --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            color: #2c3e50;
+        }
+
+        .hp {
+            font-weight: 600;
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .types {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .type-badge {
+            background-color: #f1f2f6;
+            color: #576574;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mon Pokédex</h1>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Rechercher un Pokémon par nom...">
+    </div>
+
+    <div id="errorContainer"></div>
+
+    <div class="grid" id="pokemonContainer">
+        <!-- Les cartes HTML seront injectées ici par JavaScript -->
+    </div>
+
+    <script>
+        // L'URL de votre API. Vous pouvez mettre celle de Vercel (https://...) si vous voulez y accéder depuis n'importe où.
+        const API_URL = 'http://localhost:3003/api/pokemons';
+        
+        // Variable pour stocker les pokémons et pouvoir les filtrer sans refaire de requête réseau
+        let allPokemons = [];
+
+        const container = document.getElementById('pokemonContainer');
+        const searchInput = document.getElementById('searchInput');
+        const errorContainer = document.getElementById('errorContainer');
+
+        // 1. Récupération des données via Fetch API
+        async function fetchPokemons() {
+            try {
+                const response = await fetch(API_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+
+                const json = await response.json();
+                
+                // Dans votre API (grâce à helper.success), le tableau de pokémons est dans "data"
+                allPokemons = json.data; 
+                displayPokemons(allPokemons);
+
+            } catch (error) {
+                console.error("Erreur lors de la récupération :", error);
+                showError("Impossible de charger les Pokémons. Vérifiez que votre serveur API est bien allumé !");
+            }
+        }
+
+        // 2. Affichage des Pokémons dans la grille HTML
+        function displayPokemons(pokemonsToDisplay) {
+            container.innerHTML = ''; // On vide le conteneur visuel
+
+            if (pokemonsToDisplay.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; font-size: 1.2rem; color: #7f8c8d;">Aucun Pokémon trouvé avec ce nom.</p>';
+                return;
+            }
+
+            pokemonsToDisplay.forEach(pokemon => {
+                // Création de l'élément carte
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                // Génération des badges HTML pour chaque type (Plante, Poison, Feu...)
+                const typesHtml = pokemon.types.map(type => 
+                    `<span class="type-badge">${type}</span>`
+                ).join('');
+
+                // Injection du contenu
+                card.innerHTML = `
+                    <img src="${pokemon.picture}" alt="${pokemon.name}" loading="lazy">
+                    <h2>${pokemon.name}</h2>
+                    <div class="hp">❤️ HP: ${pokemon.hp}</div>
+                    <div class="types">
+                        ${typesHtml}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Fonction utilitaire pour afficher une erreur réseau
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        // 3. Écouteur d'événement pour la barre de recherche (filtrage dynamique)
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            // On filtre le tableau complet sauvegardé en mémoire
+            const filteredPokemons = allPokemons.filter(pokemon => 
+                pokemon.name.toLowerCase().includes(searchTerm)
+            );
+            
+            // On met à jour l'affichage
+            displayPokemons(filteredPokemons);
+        });
+
+        // Déclenchement de la requête au lancement de la page
+        fetchPokemons();
+    </script>
+</body>
+</html>
