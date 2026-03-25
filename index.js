@@ -10,7 +10,8 @@ app.use(express.json());
 
 // Route pour l'accueil
 app.get('/', (req, res) => {
-    res.send(`<h3>Hello, YBoosST TEAM !</h3>`);
+    // __dirname indique le dossier actuel où se trouve le fichier index.js
+    res.sendFile(__dirname + '/index.html');
 });
 
 // Route pour voir TOUS les pokemons

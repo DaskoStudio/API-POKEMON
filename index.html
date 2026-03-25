@@ -142,8 +142,8 @@
     </div>
 
     <script>
-        // L'URL de votre API. Vous pouvez mettre celle de Vercel (https://...) si vous voulez y accéder depuis n'importe où.
-        const API_URL = 'http://localhost:3003/api/pokemons';
+        // L'URL relative de votre API. Cela fonctionnera automatiquement en local et sur Vercel !
+        const API_URL = '/api/pokemons';
         
         // Variable pour stocker les pokémons et pouvoir les filtrer sans refaire de requête réseau
         let allPokemons = [];
