@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 let pokemons = require('./db-pokemons');
 let helper = require('./helper');
 
@@ -14,8 +15,8 @@ app.use(cors());
 
 // Route pour l'accueil
 app.get('/', (req, res) => {
-    // __dirname indique le dossier actuel où se trouve le fichier index.js
-    res.sendFile(__dirname + '/index.html');
+    // Utilisation de path.join pour une meilleure compatibilité des chemins sur Vercel
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Route pour voir TOUS les pokemons
