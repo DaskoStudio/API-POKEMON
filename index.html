@@ -270,8 +270,13 @@
     </div>
 
     <script>
-        // L'URL relative de votre API. Cela fonctionnera automatiquement en local et sur Vercel !
-        const API_URL = '/api/pokemons';
+        // 1. Détection automatique de l'environnement
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        // 2. Assignation de l'URL de l'API
+        const API_URL = isLocalhost 
+            ? 'http://localhost:3003/api/pokemons' // Mode Développement (Local)
+            : 'https://api-pokemon-green.vercel.app/api/pokemons'; // Mode Production (Vercel)
         
         // Variable pour stocker les pokémons et pouvoir les filtrer sans refaire de requête réseau
         let allPokemons = [];
