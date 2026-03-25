@@ -1,8 +1,13 @@
 # API Pokémon
 
-Une simple API RESTful construite avec Node.js et Express pour gérer une collection de Pokémons.
+Une API RESTful construite avec Node.js et Express, accompagnée d'une **interface web Frontend** conviviale pour visualiser et filtrer une collection de Pokémons.
 
 Ce projet est une démonstration basique des opérations CRUD (Create, Read, Update, Delete) sans connexion à une base de données. Les données sont stockées en mémoire et sont réinitialisées à chaque redémarrage du serveur.
+
+## 🚀 Démo en ligne
+
+Le projet (Frontend + Backend API) est déployé et accessible publiquement sur Vercel :
+**[👉 Visiter le Pokédex en ligne](https://api-pokemon-green.vercel.app/)**
 
 ## Prérequis
 
@@ -31,7 +36,9 @@ Ce projet est une démonstration basique des opérations CRUD (Create, Read, Upd
     node index.js
     ```
 
-Le serveur sera alors accessible à l'adresse `http://localhost:3003`.
+Le serveur sera alors accessible à l'adresse `http://localhost:3003`. 
+
+**Nouveauté :** En vous rendant sur cette URL depuis votre navigateur, vous accéderez directement à l'interface graphique du Pokédex permettant de visualiser les cartes de chaque Pokémon et de les rechercher par nom !
 
 ## Endpoints de l'API
 
